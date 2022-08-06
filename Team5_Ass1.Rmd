@@ -1,0 +1,117 @@
+---
+title: "Team 5 Assignment 1"
+output:
+  pdf_document: default
+  html_document: default
+date: "2022-08-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readxl)
+library(dplyr)
+SuicideRate <- read_excel("C:/Users/varni/Desktop/Course Documents/GBC Jan 2022/Semester 2/BUS Intro to Analytics Systems/Assignment 1/SuicideRate.xlsx")
+View(SuicideRate)
+
+# 1. Print the structure of your dataset -  
+str(SuicideRate) 
+
+# 2. List the variables in your dataset  
+names(SuicideRate)
+
+# 3. Print the top 15 rows of your dataset  
+head(SuicideRate, 15)
+
+# 4. Write a user defined function using any of the variables from the data set.  
+mean_row = function(newdata)
+{ 
+  result = mean(SuicideRate$suicides_no) 
+  return(result) 
+} 
+print(mean_row(SuicideRate)) 
+
+# 5. Use data manipulation techniques and filter rows based on any logical criteria that exist in your dataset. 
+install.packages("dplyr")
+library(dplyr)
+SuicideRatenew=select(SuicideRate,-"HDI for year") 
+SuicideRatenew = filter(SuicideRatenew, year >= 2000 & sex == "female") 
+head(SuicideRatenew, 15)
+
+# 6. Identify the dependent & independent variables and use reshaping techniques and create a new data frame by joining those variables from your dataset.
+colnames(SuicideRate) [9] = "gdp_year" 
+Dependent = select(SuicideRate, country, population, gdp_year) 
+head(Dependent, 15) 
+
+# 7. Remove missing values in your dataset.  
+library(dplyr)
+newSuicideRate = SuicideRate
+newSuicideRate %>% filter(!is.na("HDI for year"))
+print(newSuicideRate)
+
+# 8. Identify and remove duplicated data in your dataset  
+duplicated(SuicideRate)
+
+# 9. Reorder multiple rows in descending order  
+SuicideRate = SuicideRate %>% arrange(desc(country), desc(population)) 
+head(SuicideRate, 15)
+
+# 10. Rename some of the column names in your dataset  
+colnames(SuicideRate) [9] = "gdp_year"
+names(SuicideRate)
+
+# 11. Add new variables in your data frame by using a mathematical function (for e.g. – multiply an existing column by 2 and add it as a new variable to your data frame)  
+SuicideRate$double_suicide <- SuicideRate$suicides_no*2
+print(SuicideRate)
+
+# 12. Create a training set using random number generator engine 
+head(SuicideRate)
+h <-runif(nrow(SuicideRate))
+rate<-SuicideRate[order(h), ]
+str(rate)
+train <- rate[1:36, ]
+SuicideRateclean = na.omit(SuicideRate)
+set.seed(1234)
+SuicideRateTraining = as.data.frame(SuicideRateclean %>% sample_frac(0.75,replace = FALSE))
+
+# 13. Print the summary statistics of your dataset  
+summary(SuicideRate)
+
+# 14. Use any of the numerical variables from the dataset and perform the following statistical functions  
+# 14.1 Mean
+summary(SuicideRate$population)
+
+# 14.2 Median
+summary(SuicideRate$population)
+
+# 14.3 Mode
+vec1 <- SuicideRate$population
+getmode <- function(v)
+{
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+result <- getmode(vec1)
+print(result) 
+
+# 14.4 Range
+range(SuicideRate$population)
+
+# 15. Plot a scatter plot for any 2 variables in your dataset  
+library(ggplot2) 
+plot(SuicideRate$year, SuicideRate$`gdp_per_capita ($)`, col='red', pch=19, cex=1.3, xlab='X', ylab='Y', main='Scatterplot of Two Variables') 
+
+# 16. Plot a bar plot for any 2 variables in your dataset  
+ggplot(SuicideRate, aes(fill=sex, y=suicides_no, x=country)) + geom_bar(position='dodge', stat='identity') + ggtitle('suicide rates by countries') + xlab('country') + ylab('Suicide numbers')
+
+# 17. Find the correlation between any 2 variables by applying least square linear regression model
+Y<- SuicideRate[,"population"]
+X<- SuicideRate[,"suicides_no"]
+head(X) 
+head(Y) 
+xycorr <- cor(Y,X, method="pearson")
+
+```
